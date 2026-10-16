@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Regras do VAL_07 por CNPJ</title>
+<style>
+:root{
+  --bg:#f3f5f6; --surface:#ffffff; --text:#182226; --muted:#566368; --line:#d8dfe2;
+  --ok:#17673f; --ok-bg:#dff1e7; --no:#a63128; --no-bg:#f8e3e0;
+  --warn:#7d5600; --warn-bg:#f9ecc8; --zero:#4a565b; --zero-bg:#e6eaec;
+  --lvl:#1f5c82; --lvl-bg:#dcebf4; --focus:#1f5c82;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#12171a; --surface:#1a2125; --text:#e5eaec; --muted:#9aa8ae; --line:#2b353a;
+    --ok:#6fd09a; --ok-bg:#16301f; --no:#f0a29a; --no-bg:#3a1b18;
+    --warn:#e8c26a; --warn-bg:#35290b; --zero:#b3bec3; --zero-bg:#262e32;
+    --lvl:#8cc3e6; --lvl-bg:#15303f; --focus:#8cc3e6;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);
+  font:16px/1.55 "Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:28px 18px 60px}
+h1{font-size:1.7rem;line-height:1.2;margin:0 0 6px;font-weight:700}
+h2{font-size:1.2rem;margin:34px 0 10px;font-weight:700}
+h3{font-size:1rem;margin:18px 0 6px}
+p{margin:0 0 10px;max-width:70ch}
+.sub{color:var(--muted);margin-bottom:22px}
+.tabs{display:flex;gap:6px;border-bottom:2px solid var(--line);margin-bottom:6px;flex-wrap:wrap}
+.tabs button{font:inherit;font-weight:600;background:none;border:0;color:var(--muted);
+  padding:10px 14px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px}
+.tabs button[aria-selected="true"]{color:var(--text);border-bottom-color:var(--lvl)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+section[hidden]{display:none}
+
+.codes{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.codes li{display:grid;grid-template-columns:92px 1fr;align-items:center;gap:14px;padding:10px 14px;border-top:1px solid var(--line)}
+.codes li:first-child{border-top:0}
+.n{font-size:1.9rem;font-weight:800;font-variant-numeric:tabular-nums;text-align:center;
+  border-radius:8px;padding:2px 0;line-height:1.3}
+.n.lvl{color:var(--lvl);background:var(--lvl-bg)}
+.n.ok{color:var(--ok);background:var(--ok-bg)}
+.n.no{color:var(--no);background:var(--no-bg)}
+.n.warn{color:var(--warn);background:var(--warn-bg)}
+.n.zero{color:var(--zero);background:var(--zero-bg)}
+.codes b{display:block}
+.codes span{color:var(--muted);font-size:.93rem}
+
+table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--line);
+  border-radius:8px;overflow:hidden;font-size:.95rem}
+th,td{text-align:left;padding:9px 12px;border-top:1px solid var(--line);vertical-align:top}
+thead th{background:var(--zero-bg);border-top:0;font-weight:700}
+.scroll{overflow-x:auto}
+td.cn{white-space:nowrap;font-variant-numeric:tabular-nums}
+
+.tool{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px}
+.tool label{font-weight:600;display:block;margin-bottom:6px}
+select{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:6px;
+  background:var(--bg);color:var(--text);max-width:100%}
+.res{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0;align-items:center}
+.res .lab{font-weight:600;min-width:84px}
+.pill{font-weight:800;font-variant-numeric:tabular-nums;padding:2px 12px;border-radius:999px}
+.pill.ok{color:var(--ok);background:var(--ok-bg)}
+.pill.no{color:var(--no);background:var(--no-bg)}
+.pill.zero{color:var(--zero);background:var(--zero-bg)}
+
+ol.ordem{padding-left:22px;margin:0;max-width:75ch}
+ol.ordem li{margin-bottom:6px}
+.note{border-left:4px solid var(--warn);background:var(--warn-bg);padding:10px 14px;border-radius:0 8px 8px 0;margin:14px 0;max-width:75ch}
+footer{margin-top:40px;color:var(--muted);font-size:.88rem}
+@media (max-width:520px){.codes li{grid-template-columns:70px 1fr}.n{font-size:1.5rem}}
+@media print{.tabs{display:none}section[hidden]{display:block!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Regras do VAL_07 por CNPJ</h1>
+  <p class="sub">O que cada número significa em cada validador. O código só mexe nas linhas marcadas “A PESQUISAR / ANALISE MANUAL”; o resto da planilha fica como está.</p>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" id="t1" aria-selected="true" aria-controls="p1">Níveis de ensino (Pedagogia, Letras, Psicopedagogia, Ed. Física Licenciatura)</button>
+    <button role="tab" id="t2" aria-selected="false" aria-controls="p2">Educação Física Bacharelado</button>
+    <button role="tab" id="t3" aria-selected="false" aria-controls="p3">Agronomia Bacharelado</button>
+  </div>
+
+  <!-- ===================== VALIDADOR 1 ===================== -->
+  <section id="p1" role="tabpanel" aria-labelledby="t1">
+    <h2>O que o número diz</h2>
+    <p>O número mostra quais níveis de ensino o CNPJ declara nos CNAEs. Você compara com o nível que o estágio exige e decide. Os dígitos aparecem sempre em ordem crescente.</p>
+    <ul class="codes">
+      <li><div class="n lvl">1</div><div><b>Infantil</b><span>Creche ou pré-escola</span></div></li>
+      <li><div class="n lvl">2</div><div><b>Fundamental</b><span>Fundamental 1 e 2 contam juntos</span></div></li>
+      <li><div class="n lvl">3</div><div><b>Médio</b></div></li>
+      <li><div class="n lvl">12</div><div><b>Infantil e fundamental</b></div></li>
+      <li><div class="n lvl">13</div><div><b>Infantil e médio</b></div></li>
+      <li><div class="n lvl">23</div><div><b>Fundamental e médio</b></div></li>
+      <li><div class="n lvl">123</div><div><b>Infantil, fundamental e médio</b></div></li>
+      <li><div class="n zero">0</div><div><b>Nenhum identificado</b><span>Pesquisa manual em outro lugar, como já é feito hoje</span></div></li>
+    </ul>
+
+    <h2>Quais CNAEs contam</h2>
+    <div class="scroll"><table>
+      <thead><tr><th>CNAE</th><th>Descrição</th><th>Dígito</th></tr></thead>
+      <tbody>
+        <tr><td class="cn">85.11-2-00</td><td>Educação infantil – creche</td><td>1</td></tr>
+        <tr><td class="cn">85.12-1-00</td><td>Educação infantil – pré-escola</td><td>1</td></tr>
+        <tr><td class="cn">85.13-9-00</td><td>Ensino fundamental</td><td>2</td></tr>
+        <tr><td class="cn">85.20-1-00</td><td>Ensino médio</td><td>3</td></tr>
+      </tbody>
+    </table></div>
+    <p style="margin-top:8px;color:var(--muted)">Vale o CNAE principal e os secundários. Ensino superior, técnico e outros não contam para nenhum dígito.</p>
+
+    <h2>Consulta rápida: este estágio libera?</h2>
+    <div class="tool">
+      <label for="nivel">Nível que o estágio exige</label>
+      <select id="nivel">
+        <option value="1">Infantil</option>
+        <option value="2" selected>Fundamental</option>
+        <option value="3">Médio</option>
+        <option value="12">Infantil ou fundamental</option>
+        <option value="123">Qualquer nível (infantil, fundamental ou médio)</option>
+      </select>
+      <div class="res"><span class="lab">Libera:</span><span id="libera" class="res"></span></div>
+      <div class="res"><span class="lab">Barra:</span><span id="barra" class="res"></span></div>
+      <div class="res"><span class="lab">Pesquisar:</span><span class="pill zero">0</span></div>
+    </div>
+
+    <h2>Nível que cada estágio exige</h2>
+    <h3>Educação Física – Licenciatura</h3>
+    <div class="scroll"><table>
+      <thead><tr><th>Estágio</th><th>Exige</th></tr></thead>
+      <tbody>
+        <tr><td>Estágio em Educação Física Licenciatura I</td><td>Fundamental</td></tr>
+        <tr><td>Estágio em Educação Física Licenciatura II</td><td>Fundamental</td></tr>
+        <tr><td>Estágio em Educação Física Licenciatura III</td><td>Médio</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>Letras – Português e Inglês – Licenciatura</h3>
+    <div class="scroll"><table>
+      <thead><tr><th>Estágio</th><th>Exige</th></tr></thead>
+      <tbody>
+        <tr><td>Estágio Curricular Obrigatório I (Português, Fundamental II)</td><td>Fundamental</td></tr>
+        <tr><td>Estágio Curricular Obrigatório II (Português, Ensino Médio)</td><td>Médio</td></tr>
+        <tr><td>Estágio Curricular Obrigatório III (Inglês, Fundamental II)</td><td>Fundamental</td></tr>
+        <tr><td>Estágio de Observação do Ambiente Escolar</td><td>Fundamental</td></tr>
+        <tr><td>Estágio Curricular Obrigatório IV (Inglês, Ensino Médio)</td><td>Médio</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>Psicopedagogia – Bacharelado</h3>
+    <div class="scroll"><table>
+      <thead><tr><th>Estágio</th><th>Exige</th></tr></thead>
+      <tbody>
+        <tr><td>Estágio I: O Fenômeno Escolar</td><td>Qualquer nível</td></tr>
+        <tr><td>Estágio II: Intervenções Psicopedagógicas</td><td>Qualquer nível</td></tr>
+      </tbody>
+    </table></div>
+    <p style="margin-top:8px;color:var(--muted)">Em Psicopedagogia o robô continua barrando APAE, idiomas e excepcionais.</p>
+
+    <h3>Nomes gerais (outros cursos, como Pedagogia)</h3>
+    <div class="scroll"><table>
+      <thead><tr><th>Se o nome tiver</th><th>Exige</th></tr></thead>
+      <tbody>
+        <tr><td>Infantil, Obrigatório I</td><td>Infantil</td></tr>
+        <tr><td>Fundamental, Anos iniciais, Obrigatório II, 3 ao 5</td><td>Fundamental</td></tr>
+        <tr><td>Território, Educar e do aprender</td><td>Infantil ou fundamental</td></tr>
+        <tr><td>Gestão, Educacional, Obrigatório III, Não escolares, Contexto escolar, Diagnóstico</td><td>Qualquer nível</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note">“Obrigatório I” significa coisas diferentes: em Letras exige fundamental, nos nomes gerais exige infantil. Confira o curso antes de decidir.</div>
+  </section>
+
+  <!-- ===================== VALIDADOR 2 ===================== -->
+  <section id="p2" role="tabpanel" aria-labelledby="t2" hidden>
+    <h2>O que o número diz</h2>
+    <p>Aqui o número é o resultado da linha, já comparado com o estágio (I, II ou III) que o código identifica pelo nome da disciplina.</p>
+    <ul class="codes">
+      <li><div class="n ok">4</div><div><b>Liberado</b><span>O CNPJ tem atividade que serve para o estágio da linha</span></div></li>
+      <li><div class="n no">5</div><div><b>Barrado: outra área</b><span>O CNPJ tem atividade, mas de outra área (ex.: só academia no Estágio II)</span></div></li>
+      <li><div class="n no">6</div><div><b>Barrado: ambiente escolar</b><span>O CNPJ declara escola, creche ou faculdade</span></div></li>
+      <li><div class="n warn">7</div><div><b>Saúde: conferir manualmente</b><span>Estágio III em que o CNPJ só tem CNAE de saúde (86...), sem academia ou condicionamento físico</span></div></li>
+      <li><div class="n zero">0</div><div><b>Nenhum identificado</b><span>Nenhuma atividade relevante: pesquisa manual</span></div></li>
+    </ul>
+
+    <h2>Ordem em que o código decide</h2>
+    <ol class="ordem">
+      <li>Tem CNAE de escola, creche ou faculdade: <b>6</b>, mesmo que tenha esporte junto.</li>
+      <li>Tem CNAE que libera o estágio da linha: <b>4</b>.</li>
+      <li>Estágio III e só tem CNAE de saúde: <b>7</b>.</li>
+      <li>Tem qualquer outra atividade relevante (esporte, lazer, academia, saúde): <b>5</b>.</li>
+      <li>Nenhuma das anteriores: <b>0</b>.</li>
+    </ol>
+
+    <h2>O que libera cada estágio</h2>
+    <div class="scroll"><table>
+      <thead><tr><th>Estágio</th><th>A disciplina é identificada por</th><th>CNAEs que liberam</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><b>I – Esportes e Treinamento</b></td>
+          <td>Bacharelado I, Estágio I, Esporte, Treinamento, Iniciação e Treinamento Desportivo</td>
+          <td>93.11-5-00 Instalações esportivas<br>93.12-3-00 Clubes esportivos<br>93.13-1-00 Academias e condicionamento físico<br>93.19-1-01 Eventos esportivos<br>93.19-1-99 Outras atividades esportivas<br>85.91-1-00 Ensino de esportes</td>
+        </tr>
+        <tr>
+          <td><b>II – Lazer e Recreação</b></td>
+          <td>Bacharelado II, Estágio II, Lazer, Recreação, Atividade Física na Empresa e Lazer</td>
+          <td>55.10-8-01 e 55.10-8-02 Hotéis<br>93.29-8-99 Recreação e lazer<br>82.30-0-02 Casas de festas e eventos<br>81.12-5-00 Condomínios</td>
+        </tr>
+        <tr>
+          <td><b>III – Saúde e Reabilitação</b></td>
+          <td>Bacharelado III, Estágio III, Saúde, Reabilitação, Avaliação, Prescrição e Atenção à Saúde</td>
+          <td>93.13-1-00 Academias e condicionamento físico (inclui pilates)<br><span style="color:var(--muted)">CNAEs de saúde (86...) não liberam: viram 7</span></td>
+        </tr>
+      </tbody>
+    </table></div>
+
+    <h2>Barreira escolar (código 6)</h2>
+    <div class="scroll"><table>
+      <thead><tr><th>CNAE</th><th>Descrição</th></tr></thead>
+      <tbody>
+        <tr><td class="cn">85.11-2-00</td><td>Educação infantil – creche</td></tr>
+        <tr><td class="cn">85.12-1-00</td><td>Educação infantil – pré-escola</td></tr>
+        <tr><td class="cn">85.13-9-00</td><td>Ensino fundamental</td></tr>
+        <tr><td class="cn">85.20-1-00</td><td>Ensino médio</td></tr>
+        <tr><td class="cn">85.31-7-00</td><td>Educação superior – graduação</td></tr>
+        <tr><td class="cn">85.32-5-00</td><td>Educação superior – graduação e pós-graduação</td></tr>
+        <tr><td class="cn">85.33-3-00</td><td>Educação superior – pós-graduação e extensão</td></tr>
+      </tbody>
+    </table></div>
+    <p style="margin-top:8px;color:var(--muted)">Exceção: 85.91-1-00 (ensino de esportes) não é barreira. Conta como esporte, como o “salva-vidas escolar” do painel.</p>
+
+    <h2>O que fica com o robô, fora do CNAE</h2>
+    <p>O CNAE não diferencia nomes, então estas regras continuam no seu robô: recusa geral (Conselho Escolar, associação de pais e amigos dos excepcionais), barreira escolar por nome (escola, colégio, creche, EMEF, faculdade e similares) e bloqueios específicos por nome, como “Secretaria de Esporte” no Estágio III.</p>
+    <div class="note">Só entram aqui linhas do curso Educação Física Bacharelado. Se a disciplina não for reconhecida, a linha não é alterada e o motivo fica no log. Para barrar a saúde direto em vez de usar o 7, troque <b>SAUDE_ESPECIAL</b> por <b>False</b> no começo do código.</div>
+  </section>
+
+  <!-- ===================== AGRONOMIA ===================== -->
+  <section id="p3" role="tabpanel" aria-labelledby="t3" hidden>
+    <h2>O que o número diz</h2>
+    <p>Todos os estágios de Agronomia pedem o mesmo tipo de atividade: relacionada à agricultura, preparação de solo, cultivo e à cadeia produtiva agrícola. Por isso o código não usa o nome da disciplina.</p>
+    <ul class="codes">
+      <li><div class="n ok">4</div><div><b>Liberado</b><span>O CNPJ tem pelo menos um CNAE do setor agrícola</span></div></li>
+      <li><div class="n warn">7</div><div><b>Conferir manualmente</b><span>Sem CNAE do setor, mas com um CNAE que pode estar ligado (florestal, pesca, pesquisa, órgão público, sindicato)</span></div></li>
+      <li><div class="n zero">0</div><div><b>Nenhum identificado</b><span>Nenhuma atividade do setor: pesquisa manual. O código não barra sozinho porque um CNPJ pode atuar no agro sem declarar o CNAE.</span></div></li>
+    </ul>
+    <div class="note">Para barrar em vez de pesquisar, troque <b>barrar_sem_cnae</b> por <b>True</b> na regra AGRO do código. Aí o 0 vira 5.</div>
+
+    <h2>CNAEs que liberam (código 4)</h2>
+    <div class="scroll"><table>
+      <thead><tr><th>Grupo</th><th>O que inclui</th></tr></thead>
+      <tbody>
+        <tr><td><b>Produção</b></td><td>Divisão 01 inteira: agricultura, pecuária e serviços relacionados, inclusive cana-de-açúcar</td></tr>
+        <tr><td><b>Transformação</b></td><td>Carnes e frigoríficos, conservas de frutas e legumes, óleos e gorduras, laticínios, moagem e rações, açúcar, café, fumo, aguardente e vinho</td></tr>
+        <tr><td><b>Cana e energia</b></td><td>Açúcar, fabricação de álcool (etanol) e outros biocombustíveis</td></tr>
+        <tr><td><b>Insumos e máquinas</b></td><td>Fertilizantes e adubos, defensivos agrícolas, máquinas agrícolas, manutenção de tratores e máquinas agrícolas</td></tr>
+        <tr><td><b>Comércio</b></td><td>Atacado de café, soja, sementes e matérias-primas agrícolas, de defensivos e adubos, de máquinas agropecuárias e de insumos agropecuários; representantes de matérias-primas agrícolas</td></tr>
+        <tr><td><b>Atendimento agronômico</b></td><td>74.90-1-03 Serviços de agronomia e consultoria às atividades agrícolas e pecuárias</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2>CNAEs que mandam conferir (código 7)</h2>
+    <div class="scroll"><table>
+      <thead><tr><th>CNAE</th><th>Por que confere</th></tr></thead>
+      <tbody>
+        <tr><td class="cn">Divisão 02</td><td>Produção florestal</td></tr>
+        <tr><td class="cn">Divisão 03</td><td>Pesca e aquicultura</td></tr>
+        <tr><td class="cn">72.10-0-00</td><td>Pesquisa e desenvolvimento em ciências físicas e naturais (pode ser pesquisa agrícola)</td></tr>
+        <tr><td class="cn">84.11-6-00</td><td>Administração pública em geral (prefeituras e secretarias)</td></tr>
+        <tr><td class="cn">84.13-2-00</td><td>Regulação das atividades econômicas (órgãos ligados ao agro)</td></tr>
+        <tr><td class="cn">94.11-1-00</td><td>Organizações patronais e empresariais</td></tr>
+        <tr><td class="cn">94.20-1-00</td><td>Sindicatos (ex.: sindicato rural)</td></tr>
+      </tbody>
+    </table></div>
+    <p style="margin-top:8px;color:var(--muted)">Se o CNPJ tem um CNAE que libera e um que manda conferir, vale o que libera (4).</p>
+
+    <h2>Como cadastrar um curso novo</h2>
+    <p>No começo do código existe a lista CURSOS, com uma linha por curso. Um curso novo que siga o modelo da Agronomia (uma lista de atividades que servem para todos os estágios) é só uma linha nova, com o nome que aparece na coluna CURSO e a lista de CNAEs. Linhas “A PESQUISAR” de curso não cadastrado não são alteradas, e o resumo mostra o nome de cada um para você saber o que falta cadastrar.</p>
+    <div class="note">Os CNAEs de comércio agrícola e o de serviços de agronomia foram conferidos em consulta pública. Os de indústria (frigoríficos, laticínios, fertilizantes e outros) vieram da estrutura oficial do CNAE e não foram conferidos um a um. O log mostra, para cada linha, qual CNAE pesou na decisão, então vale olhar as primeiras linhas.</div>
+  </section>
+
+  <footer>Regras conforme os códigos entregues em 15/10/2026. Se o código mudar, esta página precisa ser atualizada junto.</footer>
+</div>
+
+<script>
+(function(){
+  // abas
+  var tabs=[["t1","p1"],["t2","p2"],["t3","p3"]];
+  tabs.forEach(function(par){
+    document.getElementById(par[0]).addEventListener("click",function(){
+      tabs.forEach(function(o){
+        var on=o[0]===par[0];
+        document.getElementById(o[0]).setAttribute("aria-selected",on);
+        document.getElementById(o[1]).hidden=!on;
+      });
+    });
+  });
+  // consulta rápida
+  var codigos=["1","2","3","12","13","23","123"];
+  function pills(lista,cls){
+    return lista.length?lista.map(function(c){return '<span class="pill '+cls+'">'+c+'</span>';}).join(""):'<span style="color:var(--muted)">nenhum</span>';
+  }
+  function atualizar(){
+    var exige=document.getElementById("nivel").value.split("");
+    var libera=[],barra=[];
+    codigos.forEach(function(c){
+      var tem=c.split("").some(function(d){return exige.indexOf(d)>-1;});
+      (tem?libera:barra).push(c);
+    });
+    document.getElementById("libera").innerHTML=pills(libera,"ok");
+    document.getElementById("barra").innerHTML=pills(barra,"no");
+  }
+  document.getElementById("nivel").addEventListener("change",atualizar);
+  atualizar();
+})();
+</script>
+</body>
+</html>
